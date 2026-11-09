@@ -85,5 +85,5 @@ The `host_sensors` tests need macOS on Apple Silicon. The shell-script tests run
 
 ## Skills involved
 
-macOS internals (launchd, IOKit, TCC privacy permissions), Linux VMs and Docker, networking and VPN, storage and backup design,
+macOS internals (launchd, IOKit, TCC privacy permissions), Docker, networking and VPN, storage and backup design,
 Python and Bash, writing tests for system scripts, and keeping everything documented: architecture, state, decisions and changelog.
