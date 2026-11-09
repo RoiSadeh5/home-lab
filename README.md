@@ -1,6 +1,6 @@
 # Home Lab — a self-hosted 24/7 home server
 
-A home server I designed, built and operate on my own: media streaming, family photo backup, monitoring,
+A home server I designed and operate, developed with AI assistance: media streaming, family photo backup, monitoring,
 alerts and remote access — running unattended around the clock on Apple Silicon with 72 TB of external storage.
 
 This repository is a **curated public extract**. The full project (≈700 files: Python and shell services,
@@ -47,7 +47,7 @@ flowchart LR
 
 - **Media streaming** — Jellyfin with hardware transcoding (Apple VideoToolbox) for TVs, phones and laptops.
 - **Photo backup** — Immich, fed by a nightly iCloud archive job and a drop-folder importer that verifies every file by SHA-1 before moving it.
-- **Monitoring** — Uptime Kuma (service checks), Beszel (host metrics), Scrutiny (SMART history per drive), DIUN (container image updates), plus my own SMC sensor reader for CPU/GPU temperatures, fan speeds and DC input power.
+- **Monitoring** — Uptime Kuma (service checks), Beszel (host metrics), Scrutiny (SMART history per drive), DIUN (container image updates), plus a custom SMC sensor reader for CPU/GPU temperatures, fan speeds and DC input power.
 - **Alerting** — four push channels (alerts / requests / media / reports). An alert names the problem and the action to take, and a matching "resolved" message is sent when it clears. A daily morning report covers everything else.
 - **Remote access** — Tailscale only. No router port-forwards and nothing exposed to the public internet (the ISP is CGNAT anyway); SSH is key-only and the application firewall is on.
 
@@ -57,7 +57,7 @@ The part I care about most is that the server keeps working without me watching 
 
 - **Boot ordering** — services that need the external drives start through [`wait-for-drives.sh`](scripts/wait-for-drives.sh), which waits on the kernel mount table. Before it existed, a reboot started services before the Thunderbolt volumes mounted and left them broken.
 - **Self-healing VPN** — [`tailscale-selfcheck.sh`](scripts/tailscale-selfcheck.sh) runs every 5 minutes. If the server drops off the VPN for 10 minutes it reconnects by itself, and it raises an alert only if that fails. This was written after a 12-hour outage where every local check stayed green.
-- **Hardware sensors without root** — [`host_sensors.py`](scripts/host_sensors.py) talks to the AppleSMC through IOKit (`ctypes`). It reads per-core temperatures, GPU and SSD temperatures, fan RPM and the 12 V rail's power in watts, plus macOS thermal-pressure level. I mapped the SMC keys on this machine by loading individual cores and watching which sensors moved.
+- **Hardware sensors without root** — [`host_sensors.py`](scripts/host_sensors.py) talks to the AppleSMC through IOKit (`ctypes`). It reads per-core temperatures, GPU and SSD temperatures, fan RPM and the 12 V rail's power in watts, plus macOS thermal-pressure level. The SMC keys on this machine were mapped by loading individual cores and watching which sensors moved.
 - **Config drift detection** — [`drift-check.sh`](scripts/drift-check.sh) compares every script, launchd plist and compose file in git with the deployed copy, byte for byte. Deploys keep a dated rollback copy.
 - **Backups** — weekly hard-linked snapshots, each followed by a verify and an integrity step. Old snapshots are pruned only after all three steps pass. A daily SHA-256-verified mirror of the newest snapshot goes to a second drive, and restore tests are part of the routine. Container databases are copied consistently, never opened live.
 - **Scheduled reboots with proof** — a planned night-time reboot waits for a quiet moment and records a "fingerprint" of the system first: volumes, daemons, containers, ports, HTTP answers and VPN state. After boot it compares the fingerprint again and reports either "came back whole" or exactly what didn't.
@@ -87,3 +87,5 @@ The `host_sensors` tests need macOS on Apple Silicon. The shell-script tests run
 
 macOS internals (launchd, IOKit, TCC privacy permissions), Docker, networking and VPN, storage and backup design,
 Python and Bash, writing tests for system scripts, and keeping everything documented: architecture, state, decisions and changelog.
+
+The code was developed with AI assistance (Claude Code). I defined what the server needs to do, deployed it and run it day to day.
